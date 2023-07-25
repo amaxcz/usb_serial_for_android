@@ -36,6 +36,7 @@ abstract class DisposableStreamTransformer<T, R> implements StreamTransformer<T,
   void dispose();
 }
 
+// bugs
 class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8List, Uint8List> {
   final Duration interByteTimeout;
   late StreamController _controller;
