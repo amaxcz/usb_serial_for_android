@@ -81,6 +81,9 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
 
     _partial.addAll(data);
     _resetTimer(); // Reset the timer after each received byte.
+    // Debug:
+    print('Data received: ${data.length} bytes.');
+    print('Partial data length: ${_partial.length} bytes.');
   }
 
   @override
@@ -121,6 +124,8 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
       _controller.add(Uint8List.fromList(_partial));
       _partial.clear();
     }
+    // Debug:
+    print('Data sent: ${_partial.length} bytes.');
   }
 
   void _onTimer(Timer timer) {
@@ -128,6 +133,8 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
       _sendData();
     }
     _dataSinceLastByte = false;
+    // Debug:
+    print('Inter-byte timeout: $_dataSinceLastByte');
   }
 
   void _stopTimer() {
@@ -138,11 +145,15 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
   void _startTimer() {
     _dataSinceLastByte = false;
     _timer = Timer.periodic(interByteTimeout, _onTimer);
+    // Debug:
+    print('Timer started.');
   }
 
   void _resetTimer() {
     _stopTimer();
     _startTimer();
+    // Debug:
+    print('Timer reset.');
   }
 
   @override
@@ -151,6 +162,8 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
   @override
   void dispose() {
     _controller.close();
+    // Debug:
+    print('Transformer disposed.');
   }
 }
 
