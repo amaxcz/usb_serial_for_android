@@ -98,26 +98,21 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
     final startTime = DateTime.now();
     DateTime? lastByteTime;
 
-    try {
-      await for (final Uint8List data in _stream) {
-        onData(data);
-        lastByteTime = DateTime.now();
+    await for (final Uint8List data in _stream) {
+      onData(data);
+      lastByteTime = DateTime.now();
 
-        if (lastByteTime.difference(startTime) >= interByteTimeout) {
-          _sendData();
-          _resetTimer();
-        }
-      }
-
-      if (_dataSinceLastByte) {
+      if (lastByteTime.difference(startTime) >= interByteTimeout) {
         _sendData();
+        _resetTimer();
       }
-
-      _controller.close();
-    } catch (e) {
-      print(e);
-      _controller.addError(e);
     }
+
+    if (_dataSinceLastByte) {
+      _sendData();
+    }
+
+    _controller.close();
   }
 
   void _sendData() {
