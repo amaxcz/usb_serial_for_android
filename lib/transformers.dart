@@ -105,9 +105,8 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
         }
       }
 
-      if (_dataSinceLastByte) {
-        _sendData();
-      }
+      // Data received at the end of the stream, send it immediately.
+      _sendData();
 
       _controller.close();
     } catch (e) {
