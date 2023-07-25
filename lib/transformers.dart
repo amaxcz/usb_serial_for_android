@@ -80,6 +80,7 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
     }
 
     _partial.addAll(data);
+    _resetTimer(); // Reset the timer after each received byte.
   }
 
   @override
@@ -97,7 +98,6 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
       await for (final Uint8List data in _stream) {
         onData(data);
         lastByteTime = DateTime.now();
-        _resetTimer();
 
         if (lastByteTime.difference(startTime) >= interByteTimeout) {
           _sendData();
@@ -105,8 +105,9 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
         }
       }
 
-      // Data received at the end of the stream, send it immediately.
-      _sendData();
+      if (_dataSinceLastByte) {
+        _sendData();
+      }
 
       _controller.close();
     } catch (e) {
@@ -130,7 +131,7 @@ class InterByteTimeoutTransformer implements DisposableStreamTransformer<Uint8Li
   }
 
   void _stopTimer() {
-    _timer!.cancel();
+    _timer?.cancel();
     _timer = null;
   }
 
